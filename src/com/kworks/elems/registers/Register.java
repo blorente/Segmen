@@ -1,9 +1,11 @@
-package com.kworks.elems;
+package com.kworks.elems.registers;
 
 /**
  * Created by Kerith on 26/04/2015.
  */
 public interface Register {
+
+    public String getID();
 
     public abstract boolean readLocked();
 
@@ -12,6 +14,4 @@ public interface Register {
     public abstract boolean writeLocked();
 
     public abstract void writeLock();
-
-    public abstract ALUType getALU();
 }

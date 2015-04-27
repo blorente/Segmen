@@ -1,10 +1,16 @@
 package com.kworks.elems;
 
-/**
- * Created by Kerith on 26/04/2015.
- */
+
 public enum ALUType {
 
-    INTEGER, FP_ADD, FP_MUL, FP_DIV
+    INTEGER(1, false), FP_ADD(2, false), FP_MUL(3, true), FP_DIV(4, false);
+
+    private int latency;
+    private boolean segmented;
+
+     ALUType(int latency, boolean segmented) {
+         this.latency = latency;
+         this.segmented = segmented;
+    }
 
 }
