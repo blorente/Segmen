@@ -27,6 +27,11 @@ public class FloatingPointRegister implements Register {
     }
 
     @Override
+    public void readUnlock() {
+        this.rLock = false;
+    }
+
+    @Override
     public boolean writeLocked() {
         return this.wLock;
     }
@@ -34,5 +39,10 @@ public class FloatingPointRegister implements Register {
     @Override
     public void writeLock() {
         if (!this.wLock)  this.wLock = true;
+    }
+
+    @Override
+    public void writeUnlock() {
+        this.wLock = false;
     }
 }

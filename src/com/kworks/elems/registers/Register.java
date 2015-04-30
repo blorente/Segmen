@@ -11,7 +11,11 @@ public interface Register {
 
     public abstract void readLock();
 
+    public abstract void readUnlock();
+
     public abstract boolean writeLocked();
 
     public abstract void writeLock();
+
+    public abstract void writeUnlock();
 }
