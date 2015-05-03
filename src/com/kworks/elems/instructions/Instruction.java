@@ -6,10 +6,10 @@ import com.kworks.elems.registers.Register;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-public abstract class Instruction {
+public class Instruction {
 
-    private HashSet<Register> readRegList;
-    private HashSet<Register> writeRegList;
+    private ArrayList<Register> readRegList;
+    private ArrayList<Register> writeRegList;
     private ALUType alutype;
     private String instString;
     private int cIF;
@@ -19,17 +19,25 @@ public abstract class Instruction {
     private int cWB;
     private String label;
 
-    public Instruction(HashSet<Register> readRegList, HashSet<Register> writeRegList, ALUType alutype) {
+    public Instruction(ArrayList<Register> readRegList, ArrayList<Register> writeRegList, ALUType alutype) {
         this.readRegList = readRegList;
         this.writeRegList = writeRegList;
         this.alutype = alutype;
     }
 
-    public abstract ALUType getType();
+    public Instruction() {
+        this.readRegList = new ArrayList<Register>();
+        this.writeRegList = new ArrayList<Register>();
+        this.alutype = ALUType.FP_ADD;
+    }
 
-    public abstract ArrayList<Register> getReadRegisterList();
+    public ALUType getType() {
+        return this.alutype;
+    }
 
-    public abstract ArrayList<Register> getWriteRegisterList();
+    public ArrayList<Register> getReadRegisterList() {return this.readRegList;}
+
+    public ArrayList<Register> getWriteRegisterList(){return this.writeRegList;}
 
     @Override
     public String toString() {
@@ -90,7 +98,7 @@ public abstract class Instruction {
         this.cWB = cWB;
     }
 
-    public int lenth() {
+    public int length() {
         return cWB - cIF;
     }
 
@@ -99,5 +107,15 @@ public abstract class Instruction {
         this.cE += delay;
         this.cM += delay;
         this.cWB += delay;
+    }
+
+    public void setLabel(String label) {this.label = label;}
+
+    public void setType(ALUType type) {
+        this.alutype = type;
+    }
+
+    public void setInstString(String instString) {
+        this.instString = instString;
     }
 }

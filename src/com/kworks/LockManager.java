@@ -66,4 +66,9 @@ public class LockManager {
     public int getCycle() {
         return this.cycle;
     }
+
+    public boolean isGoingToBeLockedOnCycle(Register r, int tagetCycle) {
+        return (this.cycle + readDelays[regs.indexOf(r)] <= cycle ? true : false );
+        //True if the delay is smaller than the target cycle number, false otherwise
+    }
 }

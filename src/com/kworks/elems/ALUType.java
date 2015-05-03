@@ -33,4 +33,8 @@ public enum ALUType {
     public String toString() {
         return name;
     }
+
+    public boolean isSegmented() {
+        return segmented;
+    }
 }
