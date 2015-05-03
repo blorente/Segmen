@@ -21,6 +21,11 @@ public class LockManager {
     public LockManager(ArrayList<Register> regs) {
         this.regs = regs;
         this.cycle = 0;
+        this.alus = new ArrayList<ALUType>();
+        this.alus.add(ALUType.INTEGER);
+        this.alus.add(ALUType.FP_ADD);
+        this.alus.add(ALUType.FP_DIV);
+        this.alus.add(ALUType.FP_MUL);
 
         this.readDelays = new int[regs.size()];
         this.writeDelays = new int[regs.size()];
@@ -67,8 +72,23 @@ public class LockManager {
         return this.cycle;
     }
 
-    public boolean isGoingToBeLockedOnCycle(Register r, int tagetCycle) {
-        return (this.cycle + readDelays[regs.indexOf(r)] <= cycle ? true : false );
+    public boolean isGoingToBeReadLockedOnCycle(Register r, int targetCycle) {
+    //True if the delay is smaller than the target cycle number, false otherwise
+        int trueCycle = this.cycle + readDelays[regs.indexOf(r)];
+        if (trueCycle <= targetCycle) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public boolean isGoingToBeWriteLockedOnCycle(Register r, int targetCycle) {
         //True if the delay is smaller than the target cycle number, false otherwise
+        int trueCycle = this.cycle + writeDelays[regs.indexOf(r)];
+        if (trueCycle <= targetCycle) {
+            return false;
+        } else {
+            return true;
+        }
     }
 }

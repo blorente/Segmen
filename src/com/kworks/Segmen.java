@@ -6,10 +6,7 @@ import com.kworks.elems.registers.FloatingPointRegister;
 import com.kworks.elems.registers.IntegerRegister;
 import com.kworks.elems.registers.Register;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -20,7 +17,7 @@ public class Segmen {
 
     private static final String FILENAME = "C:\\Users\\Kerith\\Dropbox\\Universidad\\EC\\SEGMEN\\program";
 
-    public static void main(String[] args) throws FileNotFoundException, URISyntaxException {
+    public static void main(String[] args) throws FileNotFoundException, URISyntaxException, UnsupportedEncodingException {
 
         Scanner in = new Scanner(new File(FILENAME));
 
@@ -46,14 +43,16 @@ public class Segmen {
             //2) Check registers are available
             for (Register r: in.getReadRegisterList()) {
                 int cycle = in.getcID();
-                while (lm.isGoingToBeLockedOnCycle(r, cycle)) {
+                while (lm.isGoingToBeReadLockedOnCycle(r, cycle)) {
                     in.delay(1);
+                    cycle++;
                 }
             }
             for (Register r: in.getWriteRegisterList()) {
                 int cycle = in.getcID();
-                while (lm.isGoingToBeLockedOnCycle(r, cycle)) {
+                while (lm.isGoingToBeWriteLockedOnCycle(r, cycle)) {
                     in.delay(1);
+                    cycle++;
                 }
             }
             //3) Fill in the rest of cXX
@@ -62,12 +61,12 @@ public class Segmen {
             in.setcWB(in.getcM() + 1);
             //4) Wait until ALU is free
             for (int i = 0; i < instructions.indexOf(in) ; i++)  {
-                Instruction other = instructions.get(instructions.indexOf(i));
+                Instruction other = instructions.get(i);
                 if ((other.getType() == in.getType()) &&
-                        (other.getcE() <= in.getcID()) &&
+                        (other.getcE() >= in.getcID()) &&
                         (!other.getType().isSegmented())) { //segmented alus
 
-                    in.delay(in.getcID() - other.getcE());
+                    in.delay(other.getcE() - in.getcID());
 
                 } else if ((other.getType() == in.getType()) &&
                         (other.getcID() > in.getcID()) &&
@@ -79,7 +78,7 @@ public class Segmen {
             }
             //5) Compare the instruction's WB, M to avoid collisions: Delay when necessary
             for (int i = 0; i < instructions.indexOf(in) ; i++)  {
-                Instruction instr = instructions.get(instructions.indexOf(i));
+                Instruction instr = instructions.get(i);
                 int delay = 0;
                 while ( (instr.getcM() == in.getcM()) || //There is a collision
                         (instr.getcWB() == in.getcWB()) ||
@@ -88,16 +87,20 @@ public class Segmen {
                 }
             }
             //UPDATE COUNT
-            for (Register r : in.getReadRegisterList()) lm.addWriteLockForSomeCycles(r, in.getcIF() - in.getcE());
+            for (Register r : in.getWriteRegisterList()) lm.addReadLockForSomeCycles(r, in.getcE() - in.getcIF());
             lm.tick();
         }
     }
 
-    private static void printEverything(ArrayList<Instruction> instructions) {
+    private static void printEverything(ArrayList<Instruction> instructions) throws FileNotFoundException, UnsupportedEncodingException {
+        PrintWriter writer = new PrintWriter("result.txt", "ASCII");
+        //Print to command line
         for (Instruction i : instructions) {
+            writer.println(i);
             System.out.println(i);
         }
 
+        writer.close();
     }
 
     private static ArrayList<Instruction> readInstructions(ArrayList<Register> regs, Scanner in) {
@@ -112,8 +115,10 @@ public class Segmen {
                 if (tokens[tokenIndex].matches("(.*):")) {
                     inst.setLabel(tokens[tokenIndex]);
                     tokenIndex = 1;
+                    inst.setInstString(i.substring(i.indexOf(':') + 2));
+                } else {
+                    inst.setInstString(i);
                 }
-                inst.setInstString(i);
                 switch (tokens[tokenIndex]) {
 
                     case "ADDD":

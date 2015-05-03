@@ -8,6 +8,7 @@ import java.util.HashSet;
 
 public class Instruction {
 
+    private static final int MAX_INST_LEN = 15;
     private ArrayList<Register> readRegList;
     private ArrayList<Register> writeRegList;
     private ALUType alutype;
@@ -41,7 +42,11 @@ public class Instruction {
 
     @Override
     public String toString() {
-        String s = instString + "|";
+        String s = "";
+        if (this.label != null ) {
+            s += this.label + "\n";
+        }
+        s += instString + "|";
         for (int i = 0; i <= this.cWB;i++) {
             if (i == this.cIF) {
                 s += "IF|";
@@ -51,8 +56,10 @@ public class Instruction {
                 s += this.alutype.toString() + "|";
             } else if (i == this.cM) {
                 s += " M|";
-            } if (i == this.cWB) {
+            } else if (i == this.cWB) {
                 s += "WB|";
+            } else {
+                s += "  |";
             }
         }
         return s;
@@ -116,6 +123,12 @@ public class Instruction {
     }
 
     public void setInstString(String instString) {
+
         this.instString = instString;
+        if (instString.length() < MAX_INST_LEN) {
+            for (int i = instString.length(); i < MAX_INST_LEN; i++) {
+                this.instString += " ";
+            }
+        }
     }
 }
